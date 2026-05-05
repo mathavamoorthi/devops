@@ -1,0 +1,14 @@
+{
+  "name": "control-plane",
+  "version": "0.1.0",
+  "description": "Control plane API for the Vercel-clone platform",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "pg": "^8.13.1"
+  }
+}
