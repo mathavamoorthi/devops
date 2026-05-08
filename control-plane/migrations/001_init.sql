@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS projects (
+  id          SERIAL PRIMARY KEY,
+  name        TEXT NOT NULL UNIQUE,
+  repo_url    TEXT NOT NULL,
+  subdomain   TEXT NOT NULL UNIQUE,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
