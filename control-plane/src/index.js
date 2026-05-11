@@ -6,6 +6,15 @@ const logsSseRouter = require('./logs-sse');
 
 const app = express();
 
+// request logger
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    console.log(`${req.method} ${req.url} ${res.statusCode} ${Date.now() - start}ms`);
+  });
+  next();
+});
+
 app.use(express.json({
   verify: (req, _res, buf) => {
     req.rawBody = buf;
@@ -25,10 +34,15 @@ app.get('/health', async (req, res) => {
 
 // --- Projects CRUD ---
 
+const SUBDOMAIN_RE = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
+
 app.post('/projects', async (req, res) => {
   const { name, repo_url, subdomain } = req.body;
   if (!name || !repo_url || !subdomain) {
     return res.status(400).json({ error: 'name, repo_url, subdomain are required' });
+  }
+  if (!SUBDOMAIN_RE.test(subdomain)) {
+    return res.status(400).json({ error: 'subdomain must be lowercase alphanumeric with hyphens (max 63 chars)' });
   }
   try {
     const { rows } = await pool.query(
