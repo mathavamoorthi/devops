@@ -4,6 +4,10 @@ const pool = require('./db');
 
 const router = express.Router();
 
+// Verify GitHub's HMAC-SHA256 signature on the raw request body.
+// GitHub sends X-Hub-Signature-256: sha256=<hex> computed over the raw body
+// using the shared webhook secret. timingSafeEqual prevents leaking bytes via
+// comparison timing.
 function verifySignature(req, secret) {
   const sig = req.header('X-Hub-Signature-256');
   if (!sig) return false;
@@ -56,6 +60,7 @@ router.post('/github', async (req, res) => {
   );
 
   console.log(`[webhook] queued deployment ${rows[0].id} for project ${project.name}`);
+  console.log(`[webhook]   commit ${commitSha.slice(0, 8)} on ${branch}: ${commitMsg.split('\n')[0].slice(0, 60)}`);
   res.status(202).json({ deployment: rows[0] });
 });
 
