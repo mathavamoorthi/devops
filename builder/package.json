@@ -1,0 +1,13 @@
+{
+  "name": "builder",
+  "version": "0.1.0",
+  "description": "Polls the database for pending deployments and builds them",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}
