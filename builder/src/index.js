@@ -78,7 +78,13 @@ function detectAppType(repoDir) {
   if (fs.existsSync(path.join(repoDir, 'Dockerfile'))) return 'dockerfile';
   const pkgPath = path.join(repoDir, 'package.json');
   if (fs.existsSync(pkgPath)) {
-    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+    let pkg;
+    try {
+      pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+    } catch (err) {
+      console.error('[builder] failed to parse package.json:', err.message);
+      return 'static';
+    }
     if (pkg.scripts && pkg.scripts.start) return 'node-app';
     if (pkg.scripts && pkg.scripts.build) return 'node-static';
   }
@@ -219,6 +225,7 @@ async function tick() {
 async function main() {
   console.log('[builder] started, polling every', POLL_INTERVAL_MS, 'ms');
   console.log('[builder] using docker network:', NETWORK);
+  console.log('[builder] workspace:', WORKSPACE);
   while (true) {
     await tick();
     await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
