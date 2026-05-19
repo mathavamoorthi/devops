@@ -1,0 +1,20 @@
+{
+	auto_https off
+	admin off
+}
+
+:80 {
+	@subdomain header_regexp subdomain Host ^(?P<name>[a-z0-9-]+)\.localhost(?::\d+)?$
+
+	handle @subdomain {
+		reverse_proxy vc-app-{re.subdomain.name}:3000
+	}
+
+	handle {
+		respond "Vercel-clone proxy. Visit <project>.localhost:8080" 200
+	}
+
+	handle_errors {
+		respond "App not running yet (or build failed). Check the dashboard at :3000." 502
+	}
+}
