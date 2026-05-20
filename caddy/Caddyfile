@@ -3,7 +3,17 @@
 	admin off
 }
 
+(security_headers) {
+	header {
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+	}
+}
+
 :80 {
+	import security_headers
+
 	@subdomain header_regexp subdomain Host ^(?P<name>[a-z0-9-]+)\.localhost(?::\d+)?$
 
 	handle @subdomain {
