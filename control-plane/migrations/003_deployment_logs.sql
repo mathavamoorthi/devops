@@ -1,0 +1,3 @@
+ALTER TABLE deployments ADD COLUMN IF NOT EXISTS error_message TEXT;
+ALTER TABLE deployments ADD COLUMN IF NOT EXISTS build_log TEXT;
+ALTER TABLE deployments ADD COLUMN IF NOT EXISTS finished_at TIMESTAMPTZ;
