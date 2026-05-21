@@ -18,6 +18,11 @@ router.get('/:id/logs', async (req, res) => {
   let closed = false;
   req.on('close', () => { closed = true; });
 
+  // Keepalive comment every 30s prevents idle proxies from closing the SSE connection
+  const keepalive = setInterval(() => {
+    if (!closed) res.write(':keepalive\n\n');
+  }, 30000);
+
   const send = (event, data) => {
     if (closed) return;
     res.write(`event: ${event}\n`);
@@ -56,6 +61,7 @@ router.get('/:id/logs', async (req, res) => {
     await new Promise((r) => setTimeout(r, 800));
   }
 
+  clearInterval(keepalive);
   res.end();
 });
 
