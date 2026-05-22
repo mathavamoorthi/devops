@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "Polls the database for pending deployments and builds them",
   "main": "src/index.js",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js"
