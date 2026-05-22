@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vercel-clone — Deploy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #000;
+      --surface: #0a0a0a;
+      --surface-2: #111111;
+      --border: #1f1f1f;
+      --border-hover: #2e2e2e;
+      --fg: #ededed;
+      --fg-muted: #888;
+      --fg-faint: #555;
+      --accent: #fff;
+      --accent-fg: #000;
+      --blue: #0070f3;
+      --success: #0bda51;
+      --warning: #f5a623;
+      --error: #ff4444;
+      --radius: 8px;
+      --radius-sm: 6px;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    .mono { font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+    /* Top nav */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 600; font-size: 15px;
+      letter-spacing: -0.01em;
+    }
+    .logo-mark {
+      width: 22px; height: 22px;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .logo-mark svg { width: 22px; height: 22px; }
+    .nav-meta { color: var(--fg-muted); font-size: 13px; }
+    .nav-meta a { color: var(--fg); text-decoration: none; }
+
+    /* Layout */
+    main { max-width: 1100px; margin: 0 auto; padding: 32px 24px 64px; }
+    h1 {
+      font-size: 28px; font-weight: 600; letter-spacing: -0.025em;
+      margin: 8px 0 4px;
+    }
+    .subtitle { color: var(--fg-muted); margin-bottom: 32px; font-size: 14px; }
+
+    section.card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .card-title {
+      font-weight: 500;
+      font-size: 14px;
+      letter-spacing: -0.005em;
+    }
+    .card-desc {
+      color: var(--fg-muted);
+      font-size: 13px;
+      margin-top: 2px;
+    }
+    .card-body { padding: 16px 20px; }
+    .card-body.flush { padding: 0; }
+
+    /* Inputs / buttons */
+    .field {
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    label.field-label {
+      font-size: 12px; color: var(--fg-muted); font-weight: 500;
+    }
+    input[type="text"], input:not([type]) {
+      background: var(--surface-2);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      font-family: inherit;
+      font-size: 13px;
+      width: 100%;
+      transition: border-color .15s;
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--fg-muted);
+    }
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+    .input-grid-2 {
+      display: grid;
+      grid-template-columns: 2fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+    button {
+      background: var(--accent);
+      color: var(--accent-fg);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius-sm);
+      padding: 8px 14px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity .15s;
+      white-space: nowrap;
+    }
+    button:hover { opacity: 0.85; }
+    button.secondary {
+      background: transparent;
+      color: var(--fg);
+      border: 1px solid var(--border-hover);
+    }
+    button.secondary:hover { border-color: var(--fg-muted); }
+    button.danger {
+      background: transparent;
+      color: var(--error);
+      border: 1px solid var(--border-hover);
+    }
+    button.danger:hover { border-color: var(--error); }
+    button.small { padding: 4px 10px; font-size: 12px; }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead th {
+      text-align: left;
+      padding: 12px 20px;
+      color: var(--fg-muted);
+      font-weight: 500;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--border);
+    }
+    tbody td {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: var(--surface-2); }
+    td a {
+      color: var(--fg);
+      text-decoration: none;
+      border-bottom: 1px dotted var(--border-hover);
+    }
+    td a:hover { border-bottom-color: var(--fg-muted); color: var(--blue); }
+
+    /* Status pills */
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+    }
+    .pill::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .pill-pending  { color: var(--fg-muted); }
+    .pill-building { color: var(--warning); animation: pulse 1.6s ease-in-out infinite; }
+    .pill-success  { color: var(--success); }
+    .pill-failed   { color: var(--error); }
+    @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.55 } }
+
+    /* Subdomain link */
+    .subdomain-link {
+      font-family: 'Geist Mono', monospace;
+      font-size: 12px;
+      color: var(--fg);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .subdomain-link:hover { color: var(--blue); }
+    .subdomain-link::after {
+      content: '↗';
+      font-size: 11px;
+      opacity: 0.5;
+    }
+
+    /* Logs */
+    .logs-pre {
+      background: #000;
+      color: #d4d4d4;
+      padding: 14px 16px;
+      font-family: 'Geist Mono', monospace;
+      font-size: 12px;
+      line-height: 1.55;
+      overflow: auto;
+      max-height: 420px;
+      white-space: pre-wrap;
+      border-radius: 0;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
+    .empty {
+      padding: 32px 20px;
+      text-align: center;
+      color: var(--fg-faint);
+      font-size: 13px;
+    }
+    .row-msg {
+      color: var(--fg-muted);
+      font-size: 12px;
+      margin-top: 8px;
+      min-height: 1em;
+    }
+    .row-msg.err { color: var(--error); }
+
+    .app-type {
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      color: var(--fg-muted);
+      padding: 2px 6px;
+      background: var(--surface-2);
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--fg-muted);
+      letter-spacing: 0.02em;
+    }
+    .stat-value {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-top: 2px;
+    }
+    .stat-value.success { color: var(--success); }
+    .stat-value.failed  { color: var(--error); }
+
+    .commit-sha { color: var(--fg-muted); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <span class="logo-mark">
+        <svg viewBox="0 0 76 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M37.5274 0L75.0548 65H0L37.5274 0Z" fill="white"/>
+        </svg>
+      </span>
+      <span>vercel-clone</span>
+    </div>
+    <div class="nav-meta">
+      <a href="/health" target="_blank">health</a>
+    </div>
+  </header>
+
+  <main>
+    <h1>Deployments</h1>
+    <div class="subtitle">A self-hosted, language-agnostic CI/CD platform. Push code, get a live URL.</div>
+
+    <div class="stats">
+      <div class="stat"><div class="stat-label">Projects</div><div class="stat-value" id="stat-projects">—</div></div>
+      <div class="stat"><div class="stat-label">Total deploys</div><div class="stat-value" id="stat-total">—</div></div>
+      <div class="stat"><div class="stat-label">Succeeded</div><div class="stat-value success" id="stat-success">—</div></div>
+      <div class="stat"><div class="stat-label">Failed</div><div class="stat-value failed" id="stat-failed">—</div></div>
+    </div>
+
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">New Project</div>
+          <div class="card-desc">Register a repository before its first deploy.</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="input-grid">
+          <div class="field">
+            <label class="field-label">Name</label>
+            <input id="p-name" placeholder="my-site" />
+          </div>
+          <div class="field">
+            <label class="field-label">Repository URL</label>
+            <input id="p-repo" placeholder="https://github.com/user/repo" />
+          </div>
+          <div class="field">
+            <label class="field-label">Subdomain</label>
+            <input id="p-sub" placeholder="mysite" />
+          </div>
+          <button onclick="createProject()">Create</button>
+        </div>
+        <div id="create-msg" class="row-msg"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Deploy</div>
+          <div class="card-desc">Trigger a build for a registered project. Logs stream live below.</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="input-grid-2">
+          <div class="field">
+            <label class="field-label">Repository URL</label>
+            <input id="t-repo" placeholder="https://github.com/user/repo (must be registered above)" />
+          </div>
+          <div class="field">
+            <label class="field-label">Branch</label>
+            <input id="t-branch" placeholder="main" value="main" />
+          </div>
+          <button onclick="fakeWebhook()">Deploy</button>
+        </div>
+        <div id="trigger-msg" class="row-msg"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Projects</div>
+          <div class="card-desc">Each project gets a subdomain on <span class="mono">localhost:8080</span>.</div>
+        </div>
+      </div>
+      <div class="card-body flush">
+        <table id="projects-table"><thead><tr>
+          <th>Name</th><th>Repository</th><th>Subdomain</th><th></th>
+        </tr></thead><tbody><tr><td colspan="4" class="empty">No projects yet.</td></tr></tbody></table>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Deployments</div>
+          <div class="card-desc">Latest 50 deployments across all projects.</div>
+        </div>
+      </div>
+      <div class="card-body flush">
+        <table id="deployments-table"><thead><tr>
+          <th>Project</th><th>Commit</th><th>Branch</th><th>Type</th><th>Status</th><th></th>
+        </tr></thead><tbody><tr><td colspan="6" class="empty">No deployments yet.</td></tr></tbody></table>
+      </div>
+    </section>
+
+    <section class="card" id="logs-section" style="display:none">
+      <div class="card-header">
+        <div>
+          <div class="card-title" id="logs-title">Build logs</div>
+          <div class="card-desc" id="logs-desc">Streaming live…</div>
+        </div>
+        <button class="secondary small" onclick="closeLogs()">Close</button>
+      </div>
+      <div class="card-body flush">
+        <pre id="logs" class="logs-pre"></pre>
+      </div>
+    </section>
+  </main>
+
+<script>
+async function api(path, opts = {}) {
+  const r = await fetch(path, opts);
+  if (!r.ok && r.status !== 204) throw new Error(`${r.status}: ${await r.text()}`);
+  if (r.status === 204) return null;
+  return r.json();
+}
+
+function el(html) { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstChild; }
+function fmtCommit(sha) {
+  if (!sha) return '—';
+  return `<span class="mono commit-sha">${sha.slice(0, 7)}</span>`;
+}
+
+async function loadProjects() {
+  const projects = await api('/projects');
+  document.getElementById('stat-projects').textContent = projects.length;
+  const tbody = document.querySelector('#projects-table tbody');
+  if (projects.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" class="empty">No projects yet. Create one above to get started.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = '';
+  for (const p of projects) {
+    const tr = el(`<tr>
+      <td><strong>${p.name}</strong></td>
+      <td><a href="${p.repo_url}" target="_blank" rel="noopener" class="mono" style="font-size:12px">${p.repo_url.replace(/^https?:\/\//, '')}</a></td>
+      <td><a href="http://${p.subdomain}.localhost:8080" target="_blank" class="subdomain-link">${p.subdomain}.localhost:8080</a></td>
+      <td style="text-align:right"><button class="danger small" onclick="deleteProject(${p.id})">Delete</button></td>
+    </tr>`);
+    tbody.appendChild(tr);
+  }
+}
+
+async function loadDeployments() {
+  const deps = await api('/deployments');
+  document.getElementById('stat-total').textContent = deps.length;
+  document.getElementById('stat-success').textContent = deps.filter(d => d.status === 'success').length;
+  document.getElementById('stat-failed').textContent = deps.filter(d => d.status === 'failed').length;
+  const tbody = document.querySelector('#deployments-table tbody');
+  if (deps.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="empty">No deployments yet.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = '';
+  for (const d of deps) {
+    const type = d.app_type ? `<span class="app-type">${d.app_type}</span>` : '<span class="app-type" style="opacity:.4">—</span>';
+    const tr = el(`<tr>
+      <td><strong>${d.project_name}</strong></td>
+      <td>${fmtCommit(d.commit_sha)}</td>
+      <td><span class="mono" style="font-size:12px;color:var(--fg-muted)">${d.branch || '—'}</span></td>
+      <td>${type}</td>
+      <td><span class="pill pill-${d.status}">${d.status}</span></td>
+      <td style="text-align:right"><button class="secondary small" onclick="streamLogs(${d.id})">Logs</button></td>
+    </tr>`);
+    tbody.appendChild(tr);
+  }
+}
+
+async function createProject() {
+  const name = document.getElementById('p-name').value.trim();
+  const repo_url = document.getElementById('p-repo').value.trim();
+  const subdomain = document.getElementById('p-sub').value.trim();
+  const msg = document.getElementById('create-msg');
+  msg.classList.remove('err');
+  if (!name || !repo_url || !subdomain) {
+    msg.textContent = 'All fields are required.';
+    msg.classList.add('err');
+    return;
+  }
+  try {
+    await api('/projects', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, repo_url, subdomain }),
+    });
+    msg.textContent = `Created project "${name}".`;
+    document.getElementById('p-name').value = '';
+    document.getElementById('p-repo').value = '';
+    document.getElementById('p-sub').value = '';
+    loadProjects();
+  } catch (e) { msg.textContent = e.message; msg.classList.add('err'); }
+}
+
+async function deleteProject(id) {
+  if (!confirm(`Delete project ${id} and all its deployments?`)) return;
+  await api('/projects/' + id, { method: 'DELETE' });
+  loadProjects();
+  loadDeployments();
+}
+
+let eventSource = null;
+function closeLogs() {
+  if (eventSource) { eventSource.close(); eventSource = null; }
+  document.getElementById('logs-section').style.display = 'none';
+}
+function streamLogs(deploymentId) {
+  if (eventSource) eventSource.close();
+  const section = document.getElementById('logs-section');
+  section.style.display = '';
+  section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  document.getElementById('logs-title').textContent = `Build logs · deployment #${deploymentId}`;
+  document.getElementById('logs-desc').textContent = 'Streaming live…';
+  const pre = document.getElementById('logs');
+  pre.textContent = '';
+  eventSource = new EventSource('/deployments/' + deploymentId + '/logs');
+  eventSource.addEventListener('log', (e) => {
+    pre.textContent += JSON.parse(e.data).chunk;
+    pre.scrollTop = pre.scrollHeight;
+  });
+  eventSource.addEventListener('status', (e) => {
+    const d = JSON.parse(e.data);
+    pre.textContent += `\n──────── finished: ${d.status}${d.error ? ' (' + d.error + ')' : ''} ────────\n`;
+    pre.scrollTop = pre.scrollHeight;
+    document.getElementById('logs-desc').textContent = d.status === 'success' ? 'Deployment succeeded.' : `Deployment ${d.status}.`;
+    eventSource.close();
+    eventSource = null;
+    loadDeployments();
+  });
+  eventSource.addEventListener('error', () => {
+    if (eventSource) { eventSource.close(); eventSource = null; }
+    document.getElementById('logs-desc').textContent = 'Stream closed.';
+  });
+}
+
+async function fakeWebhook() {
+  const repo_url = document.getElementById('t-repo').value.trim();
+  const branch = document.getElementById('t-branch').value.trim() || 'main';
+  const msg = document.getElementById('trigger-msg');
+  msg.classList.remove('err');
+  if (!repo_url) { msg.textContent = 'Repository URL is required.'; msg.classList.add('err'); return; }
+  try {
+    const r = await api('/test/fake-push', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ repo_url, branch }),
+    });
+    msg.textContent = `Queued deployment #${r.deployment.id}. Streaming logs…`;
+    loadDeployments();
+    streamLogs(r.deployment.id);
+  } catch (e) { msg.textContent = e.message; msg.classList.add('err'); }
+}
+
+loadProjects();
+loadDeployments();
+setInterval(loadDeployments, 4000);
+</script>
+</body>
+</html>
