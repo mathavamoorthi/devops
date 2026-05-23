@@ -128,6 +128,11 @@ app.post('/test/fake-push', async (req, res) => {
 
 app.use('/deployments', logsSseRouter);
 
+// 404 catch-all for unmatched routes
+app.use((req, res) => {
+  res.status(404).json({ error: 'not found', path: req.path });
+});
+
 // --- Startup ---
 
 const PORT = process.env.PORT || 3000;
