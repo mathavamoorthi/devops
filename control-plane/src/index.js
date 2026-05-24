@@ -129,7 +129,7 @@ app.post('/test/fake-push', async (req, res) => {
 app.use('/deployments', logsSseRouter);
 
 app.get('/version', (req, res) => {
-  res.json({ version: '0.2.0-azure', host: process.env.HOSTNAME || 'unknown' });
+  res.json({ version: '0.3.0-azure', host: process.env.HOSTNAME || 'unknown' });
 });
 
 // 404 catch-all for unmatched routes
