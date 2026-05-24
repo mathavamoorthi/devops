@@ -1,5 +1,6 @@
 # Vercel-clone — DevOps capstone
 
+[![CI](https://github.com/mathavamoorthi/devops/actions/workflows/ci.yml/badge.svg)](https://github.com/mathavamoorthi/devops/actions/workflows/ci.yml)
 A self-hosted Vercel-like CI/CD platform: connect a GitHub repo, get a live URL on every push.
 
 ```
