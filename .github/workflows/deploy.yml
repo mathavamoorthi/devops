@@ -1,0 +1,73 @@
+name: Deploy to VM
+
+on:
+  push:
+    branches: [main]
+
+# Required GitHub repo secrets to make this work:
+#   VM_HOST           ssh hostname or IP of the production VM
+#   VM_USER           ssh user (e.g. 'deploy')
+#   VM_SSH_KEY        private SSH key (no passphrase). Use `ssh-keygen -t ed25519 -C 'gha-deploy'`
+#                     and add the matching public key to ~/.ssh/authorized_keys on the VM.
+#   VM_DEPLOY_PATH    absolute path on the VM, e.g. /home/deploy/devops
+#
+# This workflow assumes:
+#   - the repo is already cloned at $VM_DEPLOY_PATH on the VM
+#   - docker + docker compose are installed on the VM
+#
+# Image registry (GHCR) is the cheapest place to host built images. Below we
+# log in with the auto-provided GITHUB_TOKEN, build and push, then SSH to the
+# VM and tell it to pull + restart.
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push control-plane
+        uses: docker/build-push-action@v6
+        with:
+          context: ./control-plane
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/vercel-clone-control-plane:latest
+            ghcr.io/${{ github.repository_owner }}/vercel-clone-control-plane:${{ github.sha }}
+
+      - name: Build & push builder
+        uses: docker/build-push-action@v6
+        with:
+          context: ./builder
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/vercel-clone-builder:latest
+            ghcr.io/${{ github.repository_owner }}/vercel-clone-builder:${{ github.sha }}
+
+      - name: Deploy on VM
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host:     ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key:      ${{ secrets.VM_SSH_KEY }}
+          script: |
+            set -e
+            cd ${{ secrets.VM_DEPLOY_PATH }}
+            git fetch --all
+            git reset --hard origin/main
+            docker compose pull
+            docker compose up -d --remove-orphans
+            docker system prune -f
